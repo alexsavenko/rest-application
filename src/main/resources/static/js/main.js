@@ -1,6 +1,5 @@
-
 function getIndex(list, id) {
-    for (var i = 0; i < list.length; i++ ) {
+    for (var i = 0; i < list.length; i++) {
         if (list[i].id === id) {
             return i;
         }
@@ -14,26 +13,26 @@ var messageApi = Vue.resource('/message{/id}');
 
 Vue.component('message-form', {
     props: ['messages', 'messageAttr'],
-    data: function() {
+    data: function () {
         return {
             text: '',
             id: ''
         }
     },
     watch: {
-        messageAttr: function(newVal, oldVal) {
+        messageAttr: function (newVal, oldVal) {
             this.text = newVal.text;
             this.id = newVal.id;
         }
     },
     template:
         '<div>' +
-            '<input type="text" placeholder="Write something" v-model="text" />' +
-            '<input type="button" value="Save" @click="save" />' +
+        '<input type="text" placeholder="Write something" v-model="text" />' +
+        '<input type="button" value="Save" @click="save" />' +
         '</div>',
     methods: {
-        save: function() {
-            var message = { text: this.text };
+        save: function () {
+            var message = {text: this.text};
 
             if (this.id) {
                 messageApi.update({id: this.id}, message).then(result =>
@@ -92,13 +91,6 @@ Vue.component('messages-list', {
         '<message-row v-for="message in messages" :key="message.id" :message="message" ' +
             ':editMethod="editMethod" :messages="messages" />' +
     '</div>',
-  created: function() {
-    messageApi.get().then(result =>
-        result.json().then(data =>
-            data.forEach(message => this.messages.push(message))
-        )
-    )
-  },
   methods: {
     editMethod: function(message) {
         this.message = message;
@@ -107,9 +99,24 @@ Vue.component('messages-list', {
 });
 
 var app = new Vue({
-  el: '#app',
-  template: '<messages-list :messages="messages" />',
-  data: {
-    messages: []
-  }
+    el: '#app',
+    template:
+        '<div>' +
+            '<div v-if="!profile">Необходимо авторизоватся через <a href="/login">Google</a></div>' +
+            '<div v-else>' +
+                '<div>{{profile.name}}&nbsp;<a href="/logout">Выйти</a></div>' +
+                '<messages-list :messages="messages" />' +
+            '</div>' +
+        '</div>',
+    data: {
+        messages: frontendData.messages,
+        profile: frontendData.profile
+    },
+    created: function () {
+        // messageApi.get().then(result =>
+        //     result.json().then(data =>
+        //         data.forEach(message => this.messages.push(message))
+        //     )
+        // )
+    }
 });
